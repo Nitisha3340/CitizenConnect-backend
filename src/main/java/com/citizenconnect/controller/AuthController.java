@@ -1,6 +1,7 @@
 package com.citizenconnect.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -22,13 +23,13 @@ public class AuthController {
 
     // 🔹 SIGNUP
     @PostMapping("/signup")
-    public String signup(@RequestBody User user) {
+    public String signup(@Valid @RequestBody User user) {
         return service.register(user);
     }
 
     // 🔹 LOGIN
     @PostMapping("/login")
-    public String login(@RequestBody User request) {
+    public String login(@Valid @RequestBody User request) {
     	return service.login(request.getEmail(), request.getPassword());
     }
 

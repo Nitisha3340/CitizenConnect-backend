@@ -6,6 +6,7 @@ import com.citizenconnect.dto.ComplaintResponseDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 import com.citizenconnect.dto.StatusUpdateDTO;
 
 import com.citizenconnect.entity.Complaint;
@@ -24,7 +25,7 @@ public class ComplaintController {
     @PostMapping
     public ComplaintResponseDTO create(
         @RequestHeader("Authorization") String token,
-        @RequestBody ComplaintRequestDTO dto
+        @Valid @RequestBody ComplaintRequestDTO dto
     ) {
         String email = JwtUtil.extractEmail(token.replace("Bearer ", ""));
         return service.createComplaint(email, dto);
@@ -37,11 +38,16 @@ public class ComplaintController {
         String email = JwtUtil.extractEmail(token.replace("Bearer ", ""));
         return service.getUserComplaints(email);
     }
+
+    @GetMapping("/trending")
+    public java.util.Map<String, Long> getTrending() {
+        return service.getTrending();
+    }
     
     @PutMapping("/{id}/status")
     public ComplaintResponseDTO updateStatus(
             @PathVariable Long id,
-            @RequestBody StatusUpdateDTO dto
+            @Valid @RequestBody StatusUpdateDTO dto
     ) {
         return service.updateStatus(id, dto.getStatus());
     }

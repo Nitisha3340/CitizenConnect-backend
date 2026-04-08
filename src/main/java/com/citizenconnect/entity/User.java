@@ -3,6 +3,9 @@ package com.citizenconnect.entity;
 import jakarta.persistence.*;
 import com.citizenconnect.entity.Region;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")
@@ -16,9 +19,13 @@ public class User {
    
 
     @Column(unique = true, nullable = false)
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
     private String email;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Must be at least 6 characters")
     private String password;
 
     @Enumerated(EnumType.STRING)
