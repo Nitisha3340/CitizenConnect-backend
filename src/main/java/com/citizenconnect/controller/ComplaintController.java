@@ -1,6 +1,8 @@
 package com.citizenconnect.controller;
 
 import java.util.List;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import com.citizenconnect.dto.ComplaintRequestDTO;
 import com.citizenconnect.dto.ComplaintResponseDTO;
 
@@ -26,16 +28,19 @@ public class ComplaintController {
     public ComplaintResponseDTO create(
         @RequestHeader("Authorization") String token,
         @Valid @RequestBody ComplaintRequestDTO dto
-    ) {
-        String email = JwtUtil.extractEmail(token.replace("Bearer ", ""));
+    )
+     {
+    	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String email = authentication.getName();
         return service.createComplaint(email, dto);
     }
     // GET USER COMPLAINTS
     @GetMapping
     public List<ComplaintResponseDTO> getUserComplaints(
-            @RequestHeader("Authorization") String token
+            
     ) {
-        String email = JwtUtil.extractEmail(token.replace("Bearer ", ""));
+    	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
         return service.getUserComplaints(email);
     }
 

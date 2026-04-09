@@ -1,7 +1,13 @@
 package com.citizenconnect.entity;
 
 import jakarta.persistence.*;
+
 import com.citizenconnect.entity.Region;
+import com.citizenconnect.entity.Severity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,8 +30,10 @@ public class Complaint {
     private User user;
     
     @Enumerated(EnumType.STRING)
-    private Region region;     // North, South etc.
-    private String severity;   // LOW, MEDIUM, HIGH
+    private Region region; 
+    
+    @Enumerated(EnumType.STRING)
+    private Severity severity;  // LOW, MEDIUM, HIGH
 
     // getters & setters
 
@@ -50,6 +58,6 @@ public class Complaint {
     public Region getRegion() { return region; }
     public void setRegion(Region region) { this.region = region; }
 
-    public String getSeverity() { return severity; }
-    public void setSeverity(String severity) { this.severity = severity; }
+    public Severity getSeverity() { return severity; }
+    public void setSeverity(Severity severity) { this.severity = severity; }
 }

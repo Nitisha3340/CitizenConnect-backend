@@ -2,6 +2,7 @@ package com.citizenconnect.repository;
 
 import java.util.List;
 import com.citizenconnect.entity.Region;
+import com.citizenconnect.entity.Severity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -17,6 +18,6 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long> {
 
 	List<Complaint> findTop5ByUserEmailOrderByCreatedAtDesc(String email);
 
-	long countBySeverity(String severity);
+	long countBySeverity(Severity severity);
 	List<Complaint> findByRegion(Region region);
 }

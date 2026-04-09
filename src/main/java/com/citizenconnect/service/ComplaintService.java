@@ -1,11 +1,13 @@
 package com.citizenconnect.service;
 
 import java.time.LocalDateTime;
+
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.citizenconnect.entity.Region;
+import com.citizenconnect.entity.Severity;
 import com.citizenconnect.dto.ComplaintRequestDTO;
 import com.citizenconnect.dto.ComplaintResponseDTO;
 
@@ -88,11 +90,9 @@ public class ComplaintService {
     public Map<String, Long> getTrending() {
 
         Map<String, Long> data = new HashMap<>();
-
-        data.put("LOW", complaintRepo.countBySeverity("LOW"));
-        data.put("MEDIUM", complaintRepo.countBySeverity("MEDIUM"));
-        data.put("HIGH", complaintRepo.countBySeverity("HIGH"));
-
+        data.put("LOW", complaintRepo.countBySeverity(Severity.LOW));
+        data.put("MEDIUM", complaintRepo.countBySeverity(Severity.MEDIUM));
+        data.put("HIGH", complaintRepo.countBySeverity(Severity.HIGH));
         return data;
     }
 

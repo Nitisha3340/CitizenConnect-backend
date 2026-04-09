@@ -2,7 +2,9 @@ package com.citizenconnect.dto;
 
 import java.time.LocalDateTime;
 
+
 import com.citizenconnect.entity.Region;
+import com.citizenconnect.entity.Severity;
 
 public class ComplaintResponseDTO {
 
@@ -10,7 +12,7 @@ public class ComplaintResponseDTO {
     private String title;
     private String description;
     private Region region;
-    private String severity;
+    private Severity severity;
     private String status;
     private String userName;
     private LocalDateTime createdAt;
@@ -27,8 +29,8 @@ public class ComplaintResponseDTO {
     public Region getRegion() { return region; }
     public void setRegion(Region region) { this.region = region; }
 
-    public String getSeverity() { return severity; }
-    public void setSeverity(String severity) { this.severity = severity; }
+    public Severity getSeverity() { return severity; }
+    public void setSeverity(Severity severity) { this.severity = severity; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
@@ -38,4 +40,5 @@ public class ComplaintResponseDTO {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+	 
 }
