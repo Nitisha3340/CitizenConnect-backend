@@ -1,6 +1,8 @@
 package com.citizenconnect.controller;
 
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import com.citizenconnect.dto.ComplaintRequestDTO;
@@ -11,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import com.citizenconnect.dto.StatusUpdateDTO;
 
-import com.citizenconnect.entity.Complaint;
-import com.citizenconnect.security.JwtUtil;
 import com.citizenconnect.service.ComplaintService;
 
 @RestController
@@ -23,47 +23,58 @@ public class ComplaintController {
     @Autowired
     private ComplaintService service;
 
-    // CREATE
+    // ✅ CREATE
     @PostMapping
     public ComplaintResponseDTO create(
-        @RequestHeader("Authorization") String token,
-        @Valid @RequestBody ComplaintRequestDTO dto
-    )
-     {
-    	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String email = authentication.getName();
-        return service.createComplaint(email, dto);
-    }
-    // GET USER COMPLAINTS
-    @GetMapping
-    public List<ComplaintResponseDTO> getUserComplaints(
-            
-    ) {
-    	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        return service.getUserComplaints(email);
+            @RequestHeader("Authorization") String token,
+            @Valid @RequestBody ComplaintRequestDTO dto) {
+
+        return service.createComplaint(token, dto);
     }
 
+    // ✅ MY ISSUES
+    @GetMapping("/my")
+    public List<ComplaintResponseDTO> getUserComplaints(
+            @RequestHeader("Authorization") String token) {
+
+        return service.getUserComplaints(token);
+    }
+
+    // ✅ ALL (Admin / Politician)
+    @GetMapping
+    public List<ComplaintResponseDTO> getAll() {
+        return service.getAllComplaints();
+    }
+
+    // ✅ TRENDING
     @GetMapping("/trending")
-    public java.util.Map<String, Long> getTrending() {
+    public Map<String, Long> getTrending() {
         return service.getTrending();
     }
-    
+
+    // ✅ UPDATE STATUS
     @PutMapping("/{id}/status")
     public ComplaintResponseDTO updateStatus(
             @PathVariable Long id,
-            @Valid @RequestBody StatusUpdateDTO dto
-    ) {
+            @Valid @RequestBody StatusUpdateDTO dto) {
+
         return service.updateStatus(id, dto.getStatus());
     }
+
+    // ✅ DELETE (SECURE)
     @DeleteMapping("/{id}")
-    public String deleteComplaint(@PathVariable Long id,
-                                 @RequestParam String email) {
-        service.deleteComplaint(id, email);
-        return "Deleted successfully";
+    public void deleteComplaint(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String token) {
+
+        service.deleteComplaint(id, token);
     }
+
+    // ✅ REGION FILTER
     @GetMapping("/region")
-    public List<ComplaintResponseDTO> getByRegion(@RequestParam String email) {
-        return service.getComplaintsByRegion(email);
+    public List<ComplaintResponseDTO> getByRegion(
+            @RequestHeader("Authorization") String token) {
+
+        return service.getComplaintsByRegion(token);
     }
 }

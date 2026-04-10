@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import com.citizenconnect.entity.User;
 import com.citizenconnect.service.UserService;
 import com.citizenconnect.service.OtpService;
+import com.citizenconnect.dto.LoginRequestDTO;
 import com.citizenconnect.dto.UserProfileDTO;
 
 @RestController
@@ -28,9 +29,10 @@ public class AuthController {
     }
 
     // 🔹 LOGIN
+ // 🔹 LOGIN (UPDATED)
     @PostMapping("/login")
-    public String login(@Valid @RequestBody User request) {
-    	return service.login(request.getEmail(), request.getPassword());
+    public String login(@RequestBody LoginRequestDTO request) {
+        return service.login(request.getEmail(), request.getPassword());
     }
 
     // 🔹 SEND OTP
@@ -53,12 +55,14 @@ public class AuthController {
     }
     
     @GetMapping("/profile")
-    public UserProfileDTO getProfile(@RequestParam String email) {
-        return service.getProfile(email);
+    public UserProfileDTO getProfile(@RequestHeader("Authorization") String token) {
+        return service.getProfile(token);
     }
+
     @PutMapping("/profile")
-    public UserProfileDTO updateProfile(@RequestParam String email,
-                                        @RequestBody UserProfileDTO dto) {
-        return service.updateProfile(email, dto);
+    public UserProfileDTO updateProfile(
+            @RequestHeader("Authorization") String token,
+            @RequestBody UserProfileDTO dto) {
+        return service.updateProfile(token, dto);
     }
 }

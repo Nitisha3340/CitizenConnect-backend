@@ -26,6 +26,12 @@ public class OtpService {
 	@Transactional
 	public String generateOtp(String email) {
 
+	    repo.findByEmail(email).ifPresent(existingOtp -> {
+	        if (existingOtp.getExpiryTime().isAfter(LocalDateTime.now().minusMinutes(1))) {
+	            throw new RuntimeException("Please wait before requesting another OTP");
+	        }
+	    });
+
 	    repo.deleteByEmail(email);
 
 	    String otp = String.valueOf(100000 + new Random().nextInt(900000));
@@ -37,10 +43,9 @@ public class OtpService {
 
 	    repo.save(otpEntity);
 
-	    // ✅ SEND EMAIL
 	    emailService.sendOtp(email, otp);
 
-	    return "OTP sent to your email";
+	    return "OTP sent successfully";
 	}
 
 	@Transactional
@@ -53,22 +58,21 @@ public class OtpService {
 	        throw new RuntimeException("OTP expired");
 	    }
 
+	    // OPTIONAL: Add attempt limit (if you have field)
+	    // storedOtp.setAttempts(storedOtp.getAttempts() + 1);
+
 	    if (!storedOtp.getOtpCode().equals(otp)) {
 	        throw new RuntimeException("Invalid OTP");
 	    }
 
-	    // ✅ mark user verified
 	    User user = userRepo.findByEmail(email)
 	            .orElseThrow(() -> new RuntimeException("User not found"));
 
 	    user.setVerified(true);
 	    userRepo.save(user);
 
-	    // delete OTP
 	    repo.deleteByEmail(email);
 
 	    return true;
-	    
-	    
 	}
 }

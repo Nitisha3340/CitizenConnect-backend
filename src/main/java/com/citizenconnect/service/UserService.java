@@ -28,23 +28,22 @@ public class UserService {
     
     public String login(String email, String password) {
 
-    	User user = repo.findByEmail(email)
-    	        .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = repo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!user.getPassword().equals(password)) {
             throw new RuntimeException("Invalid password");
         }
 
+        if (!user.isVerified()) {
+            throw new RuntimeException("Please verify OTP first");
+        }
+
         return JwtUtil.generateToken(user.getEmail());
-    }  
-    public UserProfileDTO getProfile(String email) {
-
-        User user = repo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return mapToDTO(user);
     }
-    public UserProfileDTO updateProfile(String email, UserProfileDTO dto) {
+    public UserProfileDTO updateProfile(String token, UserProfileDTO dto) {
+
+        String email = JwtUtil.extractEmail(token.replace("Bearer ", ""));
 
         User user = repo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -66,5 +65,14 @@ public class UserService {
         dto.setAddress(user.getAddress());
 
         return dto;
+    }
+    public UserProfileDTO getProfile(String token) {
+
+        String email = JwtUtil.extractEmail(token.replace("Bearer ", ""));
+
+        User user = repo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return mapToDTO(user);
     }
 }

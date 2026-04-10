@@ -15,12 +15,15 @@ import com.citizenconnect.entity.Complaint;
 import com.citizenconnect.entity.User;
 import com.citizenconnect.repository.ComplaintRepository;
 import com.citizenconnect.repository.UserRepository;
+import com.citizenconnect.security.JwtUtil;
+import com.citizenconnect.security.JwtUtil;
 
 @Service
 public class ComplaintService {
 
     @Autowired
     private ComplaintRepository complaintRepo;
+    
 
     @Autowired
     private UserRepository userRepo;
@@ -28,7 +31,9 @@ public class ComplaintService {
     private Region region;
 
     // 📋 GET ALL USER COMPLAINTS (My Issues)
-    public List<ComplaintResponseDTO> getUserComplaints(String email) {
+    public List<ComplaintResponseDTO> getUserComplaints(String token) {
+
+        String email = JwtUtil.extractEmail(token.replace("Bearer ", ""));
 
         List<Complaint> complaints = complaintRepo.findByUserEmail(email);
 
@@ -40,7 +45,10 @@ public class ComplaintService {
 
         return list;
     }
-    public ComplaintResponseDTO createComplaint(String email, ComplaintRequestDTO dto) {
+    
+    public ComplaintResponseDTO createComplaint(String token, ComplaintRequestDTO dto) {
+
+        String email = JwtUtil.extractEmail(token.replace("Bearer ", ""));
 
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -49,7 +57,7 @@ public class ComplaintService {
 
         complaint.setTitle(dto.getTitle());
         complaint.setDescription(dto.getDescription());
-        complaint.setRegion(user.getRegion());
+        complaint.setRegion(dto.getRegion()); // ✅ FIXED
         complaint.setSeverity(dto.getSeverity());
 
         complaint.setUser(user);
@@ -136,7 +144,9 @@ public class ComplaintService {
 
         return mapToDTO(updated);
     }
-    public void deleteComplaint(Long id, String email) {
+    public void deleteComplaint(Long id, String token) {
+
+        String email = JwtUtil.extractEmail(token.replace("Bearer ", ""));
 
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -149,7 +159,10 @@ public class ComplaintService {
         }
 
         complaintRepo.delete(complaint);
-    }    public List<ComplaintResponseDTO> getComplaintsByRegion(String email) {
+    }
+    public List<ComplaintResponseDTO> getComplaintsByRegion(String token) {
+
+        String email = JwtUtil.extractEmail(token.replace("Bearer ", ""));
 
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
