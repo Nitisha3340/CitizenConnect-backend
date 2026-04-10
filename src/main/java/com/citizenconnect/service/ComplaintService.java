@@ -16,7 +16,6 @@ import com.citizenconnect.entity.User;
 import com.citizenconnect.repository.ComplaintRepository;
 import com.citizenconnect.repository.UserRepository;
 import com.citizenconnect.security.JwtUtil;
-import com.citizenconnect.security.JwtUtil;
 
 @Service
 public class ComplaintService {
@@ -35,7 +34,7 @@ public class ComplaintService {
 
         String email = JwtUtil.extractEmail(token.replace("Bearer ", ""));
 
-        List<Complaint> complaints = complaintRepo.findByUserEmail(email);
+        List<Complaint> complaints = complaintRepo.findByUser_Email(email);
 
         List<ComplaintResponseDTO> list = new ArrayList<>();
 
@@ -57,8 +56,8 @@ public class ComplaintService {
 
         complaint.setTitle(dto.getTitle());
         complaint.setDescription(dto.getDescription());
-        complaint.setRegion(dto.getRegion()); // ✅ FIXED
-        complaint.setSeverity(dto.getSeverity());
+        complaint.setRegion(dto.getRegion() != null ? dto.getRegion() : user.getRegion());
+        complaint.setSeverity(dto.getSeverity() != null ? dto.getSeverity() : Severity.MEDIUM);
 
         complaint.setUser(user);
         complaint.setStatus("PENDING");
@@ -71,7 +70,7 @@ public class ComplaintService {
 
     // 🔢 TOTAL COUNT (for dashboard)
     public long getTotalComplaints(String email) {
-        return complaintRepo.countByUserEmail(email);
+        return complaintRepo.countByUser_Email(email);
     }
 
     // 📊 DASHBOARD DATA
@@ -79,12 +78,12 @@ public class ComplaintService {
 
         Map<String, Object> data = new HashMap<>();
 
-        long total = complaintRepo.countByUserEmail(email);
-        long inProgress = complaintRepo.countByUserEmailAndStatus(email, "IN_PROGRESS");
-        long resolved = complaintRepo.countByUserEmailAndStatus(email, "RESOLVED");
+        long total = complaintRepo.countByUser_Email(email);
+        long inProgress = complaintRepo.countByUser_EmailAndStatus(email, "IN_PROGRESS");
+        long resolved = complaintRepo.countByUser_EmailAndStatus(email, "RESOLVED");
 
         List<Complaint> recent = complaintRepo
-                .findTop5ByUserEmailOrderByCreatedAtDesc(email);
+                .findTop5ByUser_EmailOrderByCreatedAtDesc(email);
 
         data.put("total", total);
         data.put("inProgress", inProgress);

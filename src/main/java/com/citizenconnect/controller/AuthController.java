@@ -22,26 +22,21 @@ public class AuthController {
     @Autowired
     private OtpService otpService;
 
-    // 🔹 SIGNUP
     @PostMapping("/signup")
     public String signup(@Valid @RequestBody User user) {
         return service.register(user);
     }
 
-    // 🔹 LOGIN
- // 🔹 LOGIN (UPDATED)
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequestDTO request) {
+    public String login(@Valid @RequestBody LoginRequestDTO request) {
         return service.login(request.getEmail(), request.getPassword());
     }
 
-    // 🔹 SEND OTP
     @PostMapping("/send-otp")
     public String sendOtp(@RequestParam String email) {
         return otpService.generateOtp(email);
     }
 
-    // 🔹 VERIFY OTP
     @PostMapping("/verify-otp")
     public String verifyOtp(@RequestParam String email, @RequestParam String otp) {
 
@@ -53,7 +48,7 @@ public class AuthController {
 
         return "Invalid OTP";
     }
-    
+
     @GetMapping("/profile")
     public UserProfileDTO getProfile(@RequestHeader("Authorization") String token) {
         return service.getProfile(token);

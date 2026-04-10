@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-@ControllerAdvice
+/** Only our controllers: SpringDoc (e.g. {@code /swagger-ui}) must not hit these handlers. */
+@ControllerAdvice(basePackages = "com.citizenconnect")
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
@@ -35,6 +36,30 @@ public class GlobalExceptionHandler {
                     HttpStatus.UNAUTHORIZED,
                     "Unauthorized",
                     "Invalid credentials.",
+                    request.getRequestURI());
+        }
+
+        if ("Please verify OTP first".equalsIgnoreCase(message)) {
+            return buildResponse(
+                    HttpStatus.FORBIDDEN,
+                    "Forbidden",
+                    "Please verify OTP before logging in.",
+                    request.getRequestURI());
+        }
+
+        if ("Complaint not found".equalsIgnoreCase(message)) {
+            return buildResponse(
+                    HttpStatus.NOT_FOUND,
+                    "Not Found",
+                    "Complaint not found.",
+                    request.getRequestURI());
+        }
+
+        if ("Not allowed to delete this complaint".equalsIgnoreCase(message)) {
+            return buildResponse(
+                    HttpStatus.FORBIDDEN,
+                    "Forbidden",
+                    "You are not allowed to delete this complaint.",
                     request.getRequestURI());
         }
 

@@ -10,13 +10,13 @@ import com.citizenconnect.entity.Complaint;
 
 public interface ComplaintRepository extends JpaRepository<Complaint, Long> {
 
-	List<Complaint> findByUserEmail(String email);
+	List<Complaint> findByUser_Email(String email);
 
-	long countByUserEmail(String email);
+	long countByUser_Email(String email);
 
-	long countByUserEmailAndStatus(String email, String status);
+	long countByUser_EmailAndStatus(String email, String status);
 
-	List<Complaint> findTop5ByUserEmailOrderByCreatedAtDesc(String email);
+	List<Complaint> findTop5ByUser_EmailOrderByCreatedAtDesc(String email);
 
 	long countBySeverity(Severity severity);
 	List<Complaint> findByRegion(Region region);
