@@ -1,4 +1,9 @@
 HELP.md
+
+# Local Gmail / SMTP secrets (never commit)
+mail-local.properties
+**/application-mail-local.properties
+
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

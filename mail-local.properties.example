@@ -1,0 +1,4 @@
+# Copy to mail-local.properties in this folder (that file is gitignored).
+# Use a Gmail App Password (16 characters), not your normal password.
+spring.mail.username=you@gmail.com
+spring.mail.password=xxxx-xxxx-xxxx-xxxx

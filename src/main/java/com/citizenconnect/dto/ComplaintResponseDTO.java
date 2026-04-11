@@ -14,8 +14,11 @@ public class ComplaintResponseDTO {
     private Region region;
     private Severity severity;
     private String status;
+    /** Human-readable for UI: Pending, In Progress, Resolved */
+    private String statusLabel;
     private String userName;
     private LocalDateTime createdAt;
+    private LocalDateTime resolvedAt;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -35,10 +38,15 @@ public class ComplaintResponseDTO {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
+    public String getStatusLabel() { return statusLabel; }
+    public void setStatusLabel(String statusLabel) { this.statusLabel = statusLabel; }
+
     public String getUserName() { return userName; }
     public void setUserName(String userName) { this.userName = userName; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-	 
+
+    public LocalDateTime getResolvedAt() { return resolvedAt; }
+    public void setResolvedAt(LocalDateTime resolvedAt) { this.resolvedAt = resolvedAt; }
 }

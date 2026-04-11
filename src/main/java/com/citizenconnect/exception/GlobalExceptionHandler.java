@@ -39,14 +39,6 @@ public class GlobalExceptionHandler {
                     request.getRequestURI());
         }
 
-        if ("Please verify OTP first".equalsIgnoreCase(message)) {
-            return buildResponse(
-                    HttpStatus.FORBIDDEN,
-                    "Forbidden",
-                    "Please verify OTP before logging in.",
-                    request.getRequestURI());
-        }
-
         if ("Complaint not found".equalsIgnoreCase(message)) {
             return buildResponse(
                     HttpStatus.NOT_FOUND,
@@ -60,6 +52,95 @@ public class GlobalExceptionHandler {
                     HttpStatus.FORBIDDEN,
                     "Forbidden",
                     "You are not allowed to delete this complaint.",
+                    request.getRequestURI());
+        }
+
+        if ("Politician access only".equalsIgnoreCase(message)
+                || "Moderator access only".equalsIgnoreCase(message)
+                || "Only citizens can raise issues".equalsIgnoreCase(message)
+                || "Only citizens can submit ratings".equalsIgnoreCase(message)
+                || "Only politicians can publish announcements".equalsIgnoreCase(message)) {
+            return buildResponse(
+                    HttpStatus.FORBIDDEN,
+                    "Forbidden",
+                    message,
+                    request.getRequestURI());
+        }
+
+        if ("You can only update issues in your zone".equalsIgnoreCase(message)
+                || "You can only rate your own resolved issues".equalsIgnoreCase(message)
+                || "You can only rate resolved issues".equalsIgnoreCase(message)
+                || "Already rated".equalsIgnoreCase(message)) {
+            return buildResponse(
+                    HttpStatus.FORBIDDEN,
+                    "Forbidden",
+                    message,
+                    request.getRequestURI());
+        }
+
+        if ("Invalid status".equalsIgnoreCase(message)) {
+            return buildResponse(
+                    HttpStatus.BAD_REQUEST,
+                    "Bad Request",
+                    "Status must be PENDING, IN_PROGRESS, or RESOLVED.",
+                    request.getRequestURI());
+        }
+
+        if ("OTP expired".equalsIgnoreCase(message)
+                || "Invalid OTP".equalsIgnoreCase(message)
+                || "OTP not found".equalsIgnoreCase(message)) {
+            return buildResponse(
+                    HttpStatus.BAD_REQUEST,
+                    "Bad Request",
+                    message,
+                    request.getRequestURI());
+        }
+
+        if ("Please wait before requesting another OTP".equalsIgnoreCase(message)) {
+            return buildResponse(
+                    HttpStatus.TOO_MANY_REQUESTS,
+                    "Too Many Requests",
+                    message,
+                    request.getRequestURI());
+        }
+
+        if ("Account is blocked".equalsIgnoreCase(message)) {
+            return buildResponse(
+                    HttpStatus.FORBIDDEN,
+                    "Forbidden",
+                    message,
+                    request.getRequestURI());
+        }
+
+        if ("Invalid role for self-registration".equalsIgnoreCase(message)) {
+            return buildResponse(
+                    HttpStatus.BAD_REQUEST,
+                    "Bad Request",
+                    message,
+                    request.getRequestURI());
+        }
+
+        if (message.toLowerCase().contains("region is required")) {
+            return buildResponse(
+                    HttpStatus.BAD_REQUEST,
+                    "Bad Request",
+                    message,
+                    request.getRequestURI());
+        }
+
+        if (message.startsWith("Mail is not configured")) {
+            return buildResponse(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Service Unavailable",
+                    message,
+                    request.getRequestURI());
+        }
+
+        if (message.startsWith("Could not send verification email")) {
+            return buildResponse(
+                    HttpStatus.BAD_GATEWAY,
+                    "Bad Gateway",
+                    message,
                     request.getRequestURI());
         }
 

@@ -1,0 +1,21 @@
+# Copy this file to application-mail-local.properties (same folder) and fill in values.
+# application-mail-local.properties is gitignored — do not commit it.
+
+spring.mail.username=you@gmail.com
+spring.mail.password=your-16-char-app-password-no-spaces
+
+# Optional: explicit From (defaults to username if unset)
+# spring.mail.properties.mail.from=you@gmail.com
+
+# --- Gmail via STARTTLS (default in application.properties: port 587) ---
+# (no extra lines needed if you use defaults)
+
+# --- Alternative: Gmail via SSL on port 465 (uncomment and comment 587 in a custom profile if 587 is blocked) ---
+# spring.mail.host=smtp.gmail.com
+# spring.mail.port=465
+# spring.mail.properties.mail.smtp.auth=true
+# spring.mail.properties.mail.smtp.ssl.enable=true
+# spring.mail.properties.mail.smtp.starttls.enable=false
+
+# Verbose SMTP wire log (set env MAIL_DEBUG=true or uncomment)
+# spring.mail.properties.mail.debug=true

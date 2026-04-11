@@ -1,63 +1,72 @@
 package com.citizenconnect.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import org.springframework.web.bind.annotation.*;
-
-import com.citizenconnect.entity.User;
-import com.citizenconnect.service.UserService;
-import com.citizenconnect.service.OtpService;
+import com.citizenconnect.dto.ApiMessageResponse;
+import com.citizenconnect.dto.AuthTokenResponse;
 import com.citizenconnect.dto.LoginRequestDTO;
 import com.citizenconnect.dto.UserProfileDTO;
+import com.citizenconnect.dto.UserRegistrationDTO;
+import com.citizenconnect.dto.VerifyOtpRequestDTO;
+import com.citizenconnect.service.UserService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin("*")
+@CrossOrigin(origins = "*")
 public class AuthController {
 
-    @Autowired
-    private UserService service;
+    private final UserService userService;
 
-    @Autowired
-    private OtpService otpService;
+    public AuthController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/signup")
-    public String signup(@Valid @RequestBody User user) {
-        return service.register(user);
+    @Operation(security = {})
+    public ApiMessageResponse signup(@Valid @RequestBody UserRegistrationDTO body) {
+        userService.register(body);
+        return new ApiMessageResponse("Registered. You can log in with email and password (login sends an OTP).");
     }
 
+    /** Step 1: validates password and sends login OTP to email. */
     @PostMapping("/login")
-    public String login(@Valid @RequestBody LoginRequestDTO request) {
-        return service.login(request.getEmail(), request.getPassword());
+    @Operation(security = {})
+    public ApiMessageResponse login(@Valid @RequestBody LoginRequestDTO request) {
+        userService.initiateLogin(request.getEmail(), request.getPassword());
+        return new ApiMessageResponse("OTP sent to your email. It expires in 10 minutes.");
     }
 
-    @PostMapping("/send-otp")
-    public String sendOtp(@RequestParam String email) {
-        return otpService.generateOtp(email);
-    }
-
-    @PostMapping("/verify-otp")
-    public String verifyOtp(@RequestParam String email, @RequestParam String otp) {
-
-        boolean result = otpService.verifyOtp(email, otp);
-
-        if (result) {
-            return "OTP verified successfully";
-        }
-
-        return "Invalid OTP";
+    /** Step 2: verifies login OTP and returns JWT. */
+    @PostMapping("/verify-login")
+    @Operation(security = {})
+    public AuthTokenResponse verifyLogin(@Valid @RequestBody VerifyOtpRequestDTO body) {
+        return userService.completeLogin(body);
     }
 
     @GetMapping("/profile")
-    public UserProfileDTO getProfile(@RequestHeader("Authorization") String token) {
-        return service.getProfile(token);
+    @SecurityRequirement(name = "bearerAuth")
+    public UserProfileDTO getProfile() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return userService.getProfileForUser(auth.getName());
     }
 
     @PutMapping("/profile")
-    public UserProfileDTO updateProfile(
-            @RequestHeader("Authorization") String token,
-            @RequestBody UserProfileDTO dto) {
-        return service.updateProfile(token, dto);
+    @SecurityRequirement(name = "bearerAuth")
+    public UserProfileDTO updateProfile(@RequestBody UserProfileDTO dto) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return userService.updateProfileForUser(auth.getName(), dto);
     }
 }

@@ -21,9 +21,12 @@ public class Complaint {
     private String title;
     private String description;
 
-    private String status; // PENDING, IN_PROGRESS, RESOLVED
+    /** Values: {@link IssueStatus} names, e.g. PENDING, IN_PROGRESS, RESOLVED */
+    private String status;
 
     private LocalDateTime createdAt;
+
+    private LocalDateTime resolvedAt;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -51,7 +54,9 @@ public class Complaint {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    
+    public LocalDateTime getResolvedAt() { return resolvedAt; }
+    public void setResolvedAt(LocalDateTime resolvedAt) { this.resolvedAt = resolvedAt; }
+
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
     

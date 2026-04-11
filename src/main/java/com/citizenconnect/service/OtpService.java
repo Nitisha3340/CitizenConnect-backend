@@ -3,76 +3,83 @@ package com.citizenconnect.service;
 import java.time.LocalDateTime;
 import java.util.Random;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // ✅ ADD THIS
+import org.springframework.transaction.annotation.Transactional;
 
 import com.citizenconnect.entity.Otp;
-import com.citizenconnect.entity.User;
+import com.citizenconnect.entity.OtpPurpose;
 import com.citizenconnect.repository.OtpRepository;
 import com.citizenconnect.repository.UserRepository;
 
 @Service
 public class OtpService {
-	
 
-	@Autowired
-	private UserRepository userRepo;
-	@Autowired
-	private OtpRepository repo;
-	@Autowired
-	private EmailService emailService;
-	
-	@Transactional
-	public String generateOtp(String email) {
+    private final UserRepository userRepo;
+    private final OtpRepository otpRepository;
+    private final EmailService emailService;
 
-	    repo.findByEmail(email).ifPresent(existingOtp -> {
-	        if (existingOtp.getExpiryTime().isAfter(LocalDateTime.now().minusMinutes(1))) {
-	            throw new RuntimeException("Please wait before requesting another OTP");
-	        }
-	    });
+    @Value("${app.otp.expiry-minutes:10}")
+    private int otpExpiryMinutes;
 
-	    repo.deleteByEmail(email);
+    /** Minimum seconds between OTP sends per email+purpose. Set 0 to disable (e.g. local testing). */
+    @Value("${app.otp.resend-cooldown-seconds:60}")
+    private int resendCooldownSeconds;
 
-	    String otp = String.valueOf(100000 + new Random().nextInt(900000));
+    public OtpService(UserRepository userRepo, OtpRepository otpRepository, EmailService emailService) {
+        this.userRepo = userRepo;
+        this.otpRepository = otpRepository;
+        this.emailService = emailService;
+    }
 
-	    Otp otpEntity = new Otp();
-	    otpEntity.setEmail(email);
-	    otpEntity.setOtpCode(otp);
-	    otpEntity.setExpiryTime(LocalDateTime.now().plusMinutes(5));
+    @Transactional
+    public void sendLoginOtp(String email) {
+        userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        createAndSend(email, OtpPurpose.LOGIN);
+    }
 
-	    repo.save(otpEntity);
+    private void createAndSend(String email, OtpPurpose purpose) {
+        LocalDateTime now = LocalDateTime.now();
+        if (resendCooldownSeconds > 0) {
+            otpRepository.findByEmailAndPurpose(email, purpose).ifPresent(existing -> {
+                LocalDateTime sentAt = existing.getCreatedAt();
+                if (sentAt == null) {
+                    sentAt = existing.getExpiryTime().minusMinutes(otpExpiryMinutes);
+                }
+                if (sentAt.plusSeconds(resendCooldownSeconds).isAfter(now)) {
+                    throw new RuntimeException("Please wait before requesting another OTP");
+                }
+            });
+        }
 
-	    emailService.sendOtp(email, otp);
+        otpRepository.deleteByEmailAndPurpose(email, purpose);
 
-	    return "OTP sent successfully";
-	}
+        String code = String.valueOf(100000 + new Random().nextInt(900000));
+        Otp entity = new Otp();
+        entity.setEmail(email);
+        entity.setPurpose(purpose);
+        entity.setOtpCode(code);
+        entity.setCreatedAt(now);
+        entity.setExpiryTime(now.plusMinutes(otpExpiryMinutes));
+        otpRepository.save(entity);
 
-	@Transactional
-	public boolean verifyOtp(String email, String otp) {
+        emailService.sendOtp(email, code, purpose);
+    }
 
-	    Otp storedOtp = repo.findByEmail(email)
-	            .orElseThrow(() -> new RuntimeException("OTP not found"));
+    @Transactional
+    public void verifyLoginOtp(String email, String otp) {
+        Otp stored = otpRepository.findByEmailAndPurpose(email, OtpPurpose.LOGIN)
+                .orElseThrow(() -> new RuntimeException("OTP not found"));
 
-	    if (storedOtp.getExpiryTime().isBefore(LocalDateTime.now())) {
-	        throw new RuntimeException("OTP expired");
-	    }
+        if (stored.getExpiryTime().isBefore(LocalDateTime.now())) {
+            otpRepository.deleteByEmailAndPurpose(email, OtpPurpose.LOGIN);
+            throw new RuntimeException("OTP expired");
+        }
 
-	    // OPTIONAL: Add attempt limit (if you have field)
-	    // storedOtp.setAttempts(storedOtp.getAttempts() + 1);
+        if (!stored.getOtpCode().equals(otp)) {
+            throw new RuntimeException("Invalid OTP");
+        }
 
-	    if (!storedOtp.getOtpCode().equals(otp)) {
-	        throw new RuntimeException("Invalid OTP");
-	    }
-
-	    User user = userRepo.findByEmail(email)
-	            .orElseThrow(() -> new RuntimeException("User not found"));
-
-	    user.setVerified(true);
-	    userRepo.save(user);
-
-	    repo.deleteByEmail(email);
-
-	    return true;
-	}
+        otpRepository.deleteByEmailAndPurpose(email, OtpPurpose.LOGIN);
+    }
 }
