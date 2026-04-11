@@ -33,7 +33,7 @@ public class LocalMailStartupHints implements ApplicationRunner {
             log.warn("""
                     [local] Mail is NOT configured (spring.mail.username / spring.mail.password missing).
                     Copy src/main/resources/application-mail-local.properties.example to application-mail-local.properties
-                    or set MAIL_USERNAME and MAIL_PASSWORD. OTP endpoints will fail until mail is configured.""");
+                    or set SMTP_USER / SMTP_PASSWORD or MAIL_USERNAME / MAIL_PASSWORD. OTP endpoints will fail until mail is configured.""");
         } else {
             log.info("[local] SMTP sender configured as: {}. If Swagger returns 200 but no email: check Spam, "
                     + "correct recipient address, and firewall for port 587.", user);

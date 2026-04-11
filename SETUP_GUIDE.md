@@ -67,11 +67,19 @@ spring.mail.password=your-16-char-app-password
 ```
 
 ### Production
-Set environment variables:
+Set environment variables with a Gmail App Password:
 ```bash
 MAIL_USERNAME=your-gmail@gmail.com
 MAIL_PASSWORD=your-16-char-app-password
 ```
+
+or use the SMTP aliases supported by the app:
+```bash
+SMTP_USER=your-gmail@gmail.com
+SMTP_PASSWORD=your-16-char-app-password
+```
+
+If you deploy with Railway or Docker, ensure the app password is set as the SMTP_PASSWORD / MAIL_PASSWORD value.
 
 With local profile enabled, OTP appears in console logs for testing.
 
