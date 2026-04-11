@@ -114,6 +114,7 @@
 
     <!-- Build -->
     <build>
+        <finalName>citizenconnect</finalName>
         <plugins>
 
             <!-- Spring Boot Plugin -->

@@ -55,6 +55,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
+                                "/",
+                                "/health",
                                 "/auth/signup",
                                 "/auth/login",
                                 "/auth/verify-login",
