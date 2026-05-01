@@ -1,5 +1,19 @@
-{"properties": [{
-  "name": "app.otp.resend-cooldown-seconds",
-  "type": "java.lang.String",
-  "description": "A description for 'app.otp.resend-cooldown-seconds'"
-}]}
+{
+  "properties": [
+    {
+      "name": "app.otp.resend-cooldown-seconds",
+      "type": "java.lang.Integer",
+      "description": "Cooldown time before OTP can be resent"
+    },
+    {
+      "name": "app.otp.expiry-minutes",
+      "type": "java.lang.Integer",
+      "description": "OTP expiration time in minutes"
+    },
+    {
+      "name": "app.mail.log-otp-to-console",
+      "type": "java.lang.Boolean",
+      "description": "If true, OTP is printed to console for local development"
+    }
+  ]
+}

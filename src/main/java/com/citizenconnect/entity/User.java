@@ -1,7 +1,8 @@
 package com.citizenconnect.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
-import com.citizenconnect.entity.Region;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -39,6 +40,16 @@ public class User {
     private String phone;
     private String address;
 
+    private String designation;
+    private String constituency;
+    private String bio;
+    private String profilePhotoUrl;
+
+    private boolean flagged;
+    private boolean blocked;
+
+    private LocalDateTime createdAt;
+
     // GETTERS & SETTERS
 
     public Long getId() { return id; }
@@ -67,4 +78,25 @@ public class User {
     
     public Region getRegion() { return region; }
     public void setRegion(Region region) { this.region = region; }
+
+    public String getDesignation() { return designation; }
+    public void setDesignation(String designation) { this.designation = designation; }
+
+    public String getConstituency() { return constituency; }
+    public void setConstituency(String constituency) { this.constituency = constituency; }
+
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
+
+    public String getProfilePhotoUrl() { return profilePhotoUrl; }
+    public void setProfilePhotoUrl(String profilePhotoUrl) { this.profilePhotoUrl = profilePhotoUrl; }
+
+    public boolean isFlagged() { return flagged; }
+    public void setFlagged(boolean flagged) { this.flagged = flagged; }
+
+    public boolean isBlocked() { return blocked; }
+    public void setBlocked(boolean blocked) { this.blocked = blocked; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

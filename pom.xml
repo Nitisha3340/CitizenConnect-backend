@@ -69,7 +69,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
         
@@ -91,10 +90,7 @@
          <version>0.11.5</version>
     </dependency>
         
-        <dependency>
-             <groupId>org.springframework.boot</groupId>
-             <artifactId>spring-boot-starter-mail</artifactId>
-        </dependency>
+       
 
         <!-- Testing (optional but safe) -->
         <dependency>
@@ -114,6 +110,7 @@
 
     <!-- Build -->
     <build>
+        <finalName>citizenconnect</finalName>
         <plugins>
 
             <!-- Spring Boot Plugin -->

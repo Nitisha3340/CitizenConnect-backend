@@ -19,5 +19,28 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long> {
 	List<Complaint> findTop5ByUser_EmailOrderByCreatedAtDesc(String email);
 
 	long countBySeverity(Severity severity);
+
 	List<Complaint> findByRegion(Region region);
+
+	List<Complaint> findByRegionOrderByCreatedAtDesc(Region region);
+
+	long countByRegion(Region region);
+
+	long countByRegionAndStatus(Region region, String status);
+
+	long countByStatus(String status);
+
+	long countByRegionAndStatusAndResolvedAtBetween(
+			Region region,
+			String status,
+			java.time.LocalDateTime start,
+			java.time.LocalDateTime end);
+
+	List<Complaint> findByRegionAndSeverityOrderByCreatedAtDesc(Region region, Severity severity);
+
+	long countByRegionAndSeverity(Region region, Severity severity);
+
+	List<Complaint> findTop3ByRegionAndSeverityOrderByCreatedAtDesc(Region region, Severity severity);
+
+	List<Complaint> findTop3BySeverityOrderByCreatedAtDesc(Severity severity);
 }

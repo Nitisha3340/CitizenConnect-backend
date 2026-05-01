@@ -1,63 +1,67 @@
 package com.citizenconnect.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
 
-import org.springframework.web.bind.annotation.*;
-
-import com.citizenconnect.entity.User;
-import com.citizenconnect.service.UserService;
-import com.citizenconnect.service.OtpService;
-import com.citizenconnect.dto.LoginRequestDTO;
 import com.citizenconnect.dto.UserProfileDTO;
+import com.citizenconnect.service.UserService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin("*")
+@CrossOrigin(origins = "*")
 public class AuthController {
 
-    @Autowired
-    private UserService service;
+    private final UserService userService;
 
-    @Autowired
-    private OtpService otpService;
-
-    @PostMapping("/signup")
-    public String signup(@Valid @RequestBody User user) {
-        return service.register(user);
+    public AuthController(UserService userService) {
+        this.userService = userService;
     }
 
-    @PostMapping("/login")
-    public String login(@Valid @RequestBody LoginRequestDTO request) {
-        return service.login(request.getEmail(), request.getPassword());
-    }
-
-    @PostMapping("/send-otp")
-    public String sendOtp(@RequestParam String email) {
-        return otpService.generateOtp(email);
-    }
-
-    @PostMapping("/verify-otp")
-    public String verifyOtp(@RequestParam String email, @RequestParam String otp) {
-
-        boolean result = otpService.verifyOtp(email, otp);
-
-        if (result) {
-            return "OTP verified successfully";
-        }
-
-        return "Invalid OTP";
-    }
-
+    /**
+     * Get logged-in user profile (email hidden)
+     */
     @GetMapping("/profile")
-    public UserProfileDTO getProfile(@RequestHeader("Authorization") String token) {
-        return service.getProfile(token);
+    @Operation(summary = "Get user profile")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<UserProfileDTO> getProfile() {
+
+        Authentication auth =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        UserProfileDTO profile =
+                userService.getProfileForUser(auth.getName());
+
+        return ResponseEntity.ok(profile);
     }
 
+    /**
+     * Update logged-in user profile using JWT identity
+     * Email is NOT exposed or editable
+     */
     @PutMapping("/profile")
-    public UserProfileDTO updateProfile(
-            @RequestHeader("Authorization") String token,
+    @Operation(summary = "Update user profile")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<UserProfileDTO> updateProfile(
             @RequestBody UserProfileDTO dto) {
-        return service.updateProfile(token, dto);
+
+        Authentication auth =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        UserProfileDTO updatedProfile =
+                userService.updateProfileForUser(
+                        auth.getName(),
+                        dto);
+
+        return ResponseEntity.ok(updatedProfile);
     }
 }
