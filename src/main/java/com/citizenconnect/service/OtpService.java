@@ -42,6 +42,7 @@ public class OtpService {
 	    otpEntity.setExpiryTime(LocalDateTime.now().plusMinutes(5));
 
 	    repo.save(otpEntity);
+	    System.out.println("✅ OTP for " + email + " is: " + otp);
 
 	    emailService.sendOtp(email, otp);
 
